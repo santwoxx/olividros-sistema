@@ -5,13 +5,8 @@ import {
   Phone, 
   Navigation, 
   CheckCircle2, 
-  Clock, 
-  FileCheck, 
   PenTool, 
-  Camera, 
-  ShieldCheck,
-  AlertCircle,
-  ExternalLink
+  FileSpreadsheet
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Orcamento, AssinaturaDigital } from '../types';
@@ -27,7 +22,6 @@ export const PainelFuncionario: React.FC<PainelFuncionarioProps> = ({
   orcamentos,
   onNavigate
 }) => {
-  // Filtra pedidos em fase de instalação ou entrega
   const ordens = orcamentos.filter(o => 
     o.status === 'aprovado' || 
     o.status === 'em_producao' || 
@@ -37,7 +31,7 @@ export const PainelFuncionario: React.FC<PainelFuncionarioProps> = ({
 
   const [selectedOrcamento, setSelectedOrcamento] = useState<Orcamento | null>(null);
   const [stepAssinatura, setStepAssinatura] = useState<'nenhum' | 'funcionario' | 'cliente'>('nenhum');
-  const [nomeInstalador, setNomeInstalador] = useState('Marcos Silva (Instalador Olividros)');
+  const [nomeInstalador, setNomeInstalador] = useState('Instalador Olividros');
   const [nomeClienteRecebedor, setNomeClienteRecebedor] = useState('');
   const [tempAssinaturaFuncionario, setTempAssinaturaFuncionario] = useState<AssinaturaDigital | null>(null);
   const [checklist, setChecklist] = useState({
@@ -62,7 +56,6 @@ export const PainelFuncionario: React.FC<PainelFuncionarioProps> = ({
       dataUrl
     };
     setTempAssinaturaFuncionario(assinatura);
-    // Avança para a assinatura do cliente na mesma tela
     setStepAssinatura('cliente');
   };
 
@@ -84,7 +77,7 @@ export const PainelFuncionario: React.FC<PainelFuncionarioProps> = ({
         dataConclusao: new Date().toLocaleDateString('pt-BR') + ' às ' + new Date().toLocaleTimeString('pt-BR'),
         instaladorNome: nomeInstalador,
         statusEntrega: 'instalado',
-        observacoesEntrega: 'Instalação finalizada em perfeito estado de conformidade com teste de abertura e vedação.',
+        observacoesEntrega: 'Instalação concluída com teste de conformidade.',
         assinaturaFuncionario: tempAssinaturaFuncionario,
         assinaturaClienteEntrega: assinaturaCli
       }
@@ -104,7 +97,7 @@ export const PainelFuncionario: React.FC<PainelFuncionarioProps> = ({
       // ignore
     }
 
-    alert('Instalação e Entrega Concluídas com Sucesso! As assinaturas foram carimbadas e o painel administrativo foi atualizado.');
+    alert('Instalação concluída com sucesso! As assinaturas foram registradas no sistema.');
   };
 
   const openMaps = (endereco: string, bairro: string, cidade: string) => {
@@ -113,33 +106,29 @@ export const PainelFuncionario: React.FC<PainelFuncionarioProps> = ({
   };
 
   return (
-    <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-      {/* Banner de Topo - Equipe de Campo */}
-      <div className="glass-panel glass-panel-glow" style={{ marginBottom: '1.75rem' }}>
+    <div style={{ maxWidth: '880px', margin: '0 auto' }}>
+      {/* Banner */}
+      <div className="glass-panel" style={{ marginBottom: '1.5rem', borderLeft: '4px solid #0284c7' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
-          <div style={{ width: 50, height: 50, borderRadius: 'var(--radius-md)', background: 'linear-gradient(135deg, #0284c7 0%, #00d2b4 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#04121a' }}>
-            <Truck size={26} />
+          <div style={{ width: 44, height: 44, borderRadius: 'var(--radius-sm)', background: '#e0f2fe', color: '#0284c7', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Truck size={24} />
           </div>
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: 'var(--primary)', fontSize: '0.75rem', fontWeight: 700, textTransform: 'uppercase' }}>
-              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#00d2b4', display: 'inline-block' }}></span>
-              Módulo Mobile de Instalação & Entregas
-            </div>
-            <h2 style={{ fontSize: '1.5rem', color: '#ffffff' }}>Equipe de Campo Olividros</h2>
+            <h2 style={{ fontSize: '1.35rem', color: '#0f172a' }}>Equipe de Instalação & Entregas</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-              Rotas no Maps, checklist de conferência e protocolo de <strong>Assinatura Digital Dupla</strong> (Instalador + Cliente)
+              Rotas no Maps, checklist de instalação e protocolo de <strong>Assinatura Digital Dupla</strong> (Instalador + Cliente)
             </p>
           </div>
         </div>
       </div>
 
-      {/* Lista de Ordens de Instalação */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+      {/* Lista de Ordens */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {ordens.length === 0 ? (
-          <div className="glass-panel" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-            <Clock size={36} color="var(--text-muted)" style={{ margin: '0 auto 0.75rem auto' }} />
-            <h3 style={{ color: '#ffffff', marginBottom: '0.25rem' }}>Nenhuma instalação na rota no momento</h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Os orçamentos aprovados aparecerão automaticamente aqui.</p>
+          <div className="empty-state">
+            <FileSpreadsheet size={36} color="#94a3b8" style={{ margin: '0 auto 0.75rem auto' }} />
+            <h3>Nenhuma instalação agendada</h3>
+            <p>Assim que um orçamento for aprovado pelo cliente, ele aparecerá aqui com o endereço e rota para instalação.</p>
           </div>
         ) : (
           ordens.map(orc => {
@@ -150,20 +139,20 @@ export const PainelFuncionario: React.FC<PainelFuncionarioProps> = ({
                 key={orc.id} 
                 className="glass-panel" 
                 style={{ 
-                  borderLeft: isFinished ? '4px solid #10b981' : '4px solid #00d2b4',
+                  borderLeft: isFinished ? '4px solid #16a34a' : '4px solid #0284c7',
                   padding: '1.25rem'
                 }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.75rem' }}>
                   <div>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 800, color: 'var(--primary)' }}>
+                    <span style={{ fontSize: '0.82rem', fontWeight: 800, color: '#16a34a' }}>
                       OS #{orc.numeroProtocolo}
                     </span>
-                    <h3 style={{ fontSize: '1.2rem', color: '#ffffff', marginTop: '0.2rem' }}>
+                    <h3 style={{ fontSize: '1.15rem', color: '#0f172a', marginTop: '0.15rem' }}>
                       {orc.cliente.nome}
                     </h3>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--text-muted)', fontSize: '0.85rem', marginTop: '0.25rem' }}>
-                      <MapPin size={15} color="var(--primary)" />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.35rem', color: 'var(--text-muted)', fontSize: '0.82rem', marginTop: '0.2rem' }}>
+                      <MapPin size={14} color="#16a34a" />
                       <span>{orc.cliente.endereco}, {orc.cliente.bairro} - {orc.cliente.cidade}</span>
                     </div>
                   </div>
@@ -171,90 +160,86 @@ export const PainelFuncionario: React.FC<PainelFuncionarioProps> = ({
                   <div style={{ textAlign: 'right' }}>
                     {isFinished ? (
                       <span className="status-pill status-concluido">
-                        <CheckCircle2 size={13} /> Concluído & Assinado
+                        <CheckCircle2 size={12} /> Concluído
                       </span>
                     ) : (
                       <span className="status-pill status-em_producao">
-                        Em Rota / Para Instalar
+                        Em Rota / Instalação
                       </span>
                     )}
                   </div>
                 </div>
 
-                {/* Itens para Instalação */}
-                <div style={{ background: 'rgba(8, 18, 27, 0.7)', borderRadius: 'var(--radius-md)', padding: '0.75rem 1rem', marginBottom: '1rem', border: '1px solid var(--border-subtle)' }}>
-                  <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.35rem' }}>
+                {/* Itens */}
+                <div style={{ background: '#f8fafc', borderRadius: 'var(--radius-md)', padding: '0.65rem 0.85rem', marginBottom: '0.85rem', border: '1px solid #e2e8f0' }}>
+                  <div style={{ fontSize: '0.72rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.25rem' }}>
                     Vidros a serem instalados:
                   </div>
                   {orc.itens.map((item, idx) => (
-                    <div key={idx} style={{ fontSize: '0.88rem', color: '#ffffff', padding: '0.25rem 0' }}>
+                    <div key={idx} style={{ fontSize: '0.85rem', color: '#0f172a', padding: '0.15rem 0' }}>
                       • <strong>{item.descricao}</strong> ({item.larguraCm}x{item.alturaCm}cm) - Vidro {item.corVidro} / Perfil {item.corPerfil}
                     </div>
                   ))}
                 </div>
 
-                {/* Se já foi finalizado, exibe as duas assinaturas carimbadas */}
+                {/* Assinaturas se concluído */}
                 {isFinished && orc.entrega?.assinaturaFuncionario && orc.entrega?.assinaturaClienteEntrega && (
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem', background: 'rgba(16, 185, 129, 0.08)', padding: '1rem', borderRadius: 'var(--radius-md)', border: '1px solid rgba(16, 185, 129, 0.25)', marginBottom: '1rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0.85rem', background: '#f0fdf4', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid #bbf7d0', marginBottom: '0.85rem' }}>
                     <div>
-                      <div style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700, marginBottom: '0.35rem' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#166534', fontWeight: 700, marginBottom: '0.25rem' }}>
                         ✓ Assinatura do Instalador:
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#ffffff', marginBottom: '0.35rem' }}>
+                      <div style={{ fontSize: '0.78rem', color: '#0f172a', marginBottom: '0.25rem' }}>
                         {orc.entrega.assinaturaFuncionario.autorNome}
                       </div>
-                      <div style={{ background: '#050c12', padding: '0.5rem', borderRadius: '4px', border: '1px solid rgba(0, 210, 180, 0.2)' }}>
+                      <div style={{ background: '#ffffff', padding: '0.4rem', borderRadius: '4px', border: '1px solid #cbd5e1' }}>
                         <img src={orc.entrega.assinaturaFuncionario.dataUrl} alt="Assinatura Instalador" style={{ width: '100%', height: 'auto', display: 'block' }} />
                       </div>
                     </div>
 
                     <div>
-                      <div style={{ fontSize: '0.75rem', color: '#10b981', fontWeight: 700, marginBottom: '0.35rem' }}>
+                      <div style={{ fontSize: '0.75rem', color: '#166534', fontWeight: 700, marginBottom: '0.25rem' }}>
                         ✓ Assinatura do Cliente no Recebimento:
                       </div>
-                      <div style={{ fontSize: '0.8rem', color: '#ffffff', marginBottom: '0.35rem' }}>
+                      <div style={{ fontSize: '0.78rem', color: '#0f172a', marginBottom: '0.25rem' }}>
                         {orc.entrega.assinaturaClienteEntrega.autorNome}
                       </div>
-                      <div style={{ background: '#050c12', padding: '0.5rem', borderRadius: '4px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+                      <div style={{ background: '#ffffff', padding: '0.4rem', borderRadius: '4px', border: '1px solid #cbd5e1' }}>
                         <img src={orc.entrega.assinaturaClienteEntrega.dataUrl} alt="Assinatura Cliente" style={{ width: '100%', height: 'auto', display: 'block' }} />
                       </div>
                     </div>
                   </div>
                 )}
 
-                {/* Botões de Ação na Rua / Celular */}
-                <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    {/* Abrir Rota no GPS */}
+                {/* Ações */}
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
                     <button
                       type="button"
                       onClick={() => openMaps(orc.cliente.endereco, orc.cliente.bairro, orc.cliente.cidade)}
                       className="btn btn-secondary btn-sm"
-                      title="Abrir GPS no Google Maps"
                     >
-                      <Navigation size={15} color="var(--primary)" />
+                      <Navigation size={14} color="#0284c7" />
                       Rota no Maps
                     </button>
 
-                    {/* Ligar / WhatsApp */}
                     <a
                       href={`tel:${orc.cliente.telefone || orc.cliente.whatsapp}`}
                       className="btn btn-secondary btn-sm"
                     >
-                      <Phone size={15} />
+                      <Phone size={14} />
                       Ligar
                     </a>
                   </div>
 
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <div>
                     {!isFinished ? (
                       <button
                         type="button"
                         onClick={() => handleOpenFinalizar(orc)}
                         className="btn btn-primary btn-sm"
-                        style={{ boxShadow: '0 0 15px rgba(0, 210, 180, 0.35)' }}
                       >
-                        <PenTool size={16} />
+                        <PenTool size={15} />
                         Coletar Assinaturas de Entrega
                       </button>
                     ) : (
@@ -274,64 +259,63 @@ export const PainelFuncionario: React.FC<PainelFuncionarioProps> = ({
         )}
       </div>
 
-      {/* MODAL / TELA DE ASSINATURA DUPLA DE ENTREGA */}
+      {/* MODAL DE ASSINATURA DUPLA */}
       {selectedOrcamento && stepAssinatura !== 'nenhum' && (
         <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '620px' }}>
+          <div className="modal-content" style={{ maxWidth: '600px' }}>
             <div className="modal-header">
               <div>
-                <h3 style={{ color: '#ffffff', fontSize: '1.2rem' }}>
+                <h3 style={{ color: '#0f172a', fontSize: '1.15rem' }}>
                   Finalização de Instalação • OS #{selectedOrcamento.numeroProtocolo}
                 </h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem' }}>
+                <p style={{ color: 'var(--text-muted)', fontSize: '0.78rem' }}>
                   Cliente: {selectedOrcamento.cliente.nome} ({selectedOrcamento.cliente.bairro})
                 </p>
               </div>
               <button 
                 type="button" 
                 onClick={() => { setSelectedOrcamento(null); setStepAssinatura('nenhum'); }}
-                className="btn-icon-close" 
-                style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}
+                style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer' }}
               >
                 ✕
               </button>
             </div>
 
             <div className="modal-body">
-              {/* Checklist de Qualidade da Vidraçaria */}
-              <div style={{ background: 'rgba(8, 18, 27, 0.6)', padding: '0.85rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', marginBottom: '1.25rem' }}>
-                <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.5rem' }}>
+              {/* Checklist */}
+              <div style={{ background: '#f8fafc', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid #e2e8f0', marginBottom: '1rem' }}>
+                <div style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.35rem' }}>
                   Checklist de Qualidade Olividros:
                 </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', fontSize: '0.85rem' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ffffff' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.4rem', fontSize: '0.82rem' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <input type="checkbox" checked={checklist.vidroSemAvarias} onChange={e => setChecklist({ ...checklist, vidroSemAvarias: e.target.checked })} />
                     Vidro sem trincas ou riscos
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ffffff' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <input type="checkbox" checked={checklist.roldanasReguladas} onChange={e => setChecklist({ ...checklist, roldanasReguladas: e.target.checked })} />
-                    Roldanas/Puxadores regulados
+                    Roldanas reguladas
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ffffff' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <input type="checkbox" checked={checklist.siliconeAplicado} onChange={e => setChecklist({ ...checklist, siliconeAplicado: e.target.checked })} />
-                    Silicone de vedação aplicado
+                    Silicone de vedação
                   </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#ffffff' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
                     <input type="checkbox" checked={checklist.areaLimpa} onChange={e => setChecklist({ ...checklist, areaLimpa: e.target.checked })} />
-                    Local limpo e aspirado
+                    Local limpo
                   </label>
                 </div>
               </div>
 
               {stepAssinatura === 'funcionario' && (
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--primary)', marginBottom: '0.75rem', fontWeight: 700 }}>
-                    <span style={{ width: 22, height: 22, borderRadius: '50%', background: 'var(--primary)', color: '#04121a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>1</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#16a34a', marginBottom: '0.65rem', fontWeight: 700, fontSize: '0.88rem' }}>
+                    <span style={{ width: 20, height: 20, borderRadius: '50%', background: '#16a34a', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>1</span>
                     PASSO 1 DE 2: Assinatura do Instalador Olividros
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Nome do Instalador Responsável</label>
+                    <label className="form-label">Nome do Instalador</label>
                     <input
                       type="text"
                       className="form-control"
@@ -342,7 +326,7 @@ export const PainelFuncionario: React.FC<PainelFuncionarioProps> = ({
 
                   <SignaturePad
                     titulo="Assinatura do Instalador"
-                    subtitulo="Assine atestando a instalação correta e conformidade técnica dos vidros"
+                    subtitulo="Assine atestando a instalação correta e conformidade técnica"
                     autorNome={nomeInstalador}
                     onSave={handleSaveAssinaturaFuncionario}
                     onCancel={() => setStepAssinatura('nenhum')}
@@ -352,13 +336,13 @@ export const PainelFuncionario: React.FC<PainelFuncionarioProps> = ({
 
               {stepAssinatura === 'cliente' && (
                 <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: '#10b981', marginBottom: '0.75rem', fontWeight: 700 }}>
-                    <span style={{ width: 22, height: 22, borderRadius: '50%', background: '#10b981', color: '#04121a', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.8rem' }}>2</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: '#16a34a', marginBottom: '0.65rem', fontWeight: 700, fontSize: '0.88rem' }}>
+                    <span style={{ width: 20, height: 20, borderRadius: '50%', background: '#16a34a', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem' }}>2</span>
                     PASSO 2 DE 2: Assinatura do Cliente no Recebimento
                   </div>
 
                   <div className="form-group">
-                    <label className="form-label">Nome de Quem Está Recebendo na Residência</label>
+                    <label className="form-label">Nome de Quem Está Recebendo</label>
                     <input
                       type="text"
                       className="form-control"
@@ -368,8 +352,8 @@ export const PainelFuncionario: React.FC<PainelFuncionarioProps> = ({
                     />
                   </div>
 
-                  <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>
-                    Entregue o celular ao cliente para que ele assine com o dedo confirmando o recebimento em perfeito estado:
+                  <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '0.65rem' }}>
+                    Entregue o celular ao cliente para que ele assine confirmando o recebimento:
                   </p>
 
                   <SignaturePad

@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { 
   CheckCircle2, 
-  Clock, 
-  FileText, 
   ShieldCheck, 
   MessageSquare, 
   Printer, 
   Receipt,
   AlertCircle,
-  Sparkles,
-  ArrowLeft
+  ArrowLeft,
+  Building2
 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 import { Orcamento, AssinaturaDigital } from '../types';
@@ -26,22 +24,20 @@ export const VerAprovarOrcamento: React.FC<VerAprovarOrcamentoProps> = ({
   onNavigate
 }) => {
   const orcamentos = storageService.getOrcamentos();
-  // Se não passar ID, pega o primeiro orçamento da lista para demonstração
   const orcamento = orcamentos.find(o => o.id === orcamentoId) || orcamentos[0];
 
   const [isSigningOpen, setIsSigningOpen] = useState(false);
   const [signerNome, setSignerNome] = useState(orcamento?.cliente.nome || '');
   const [signerCpf, setSignerCpf] = useState(orcamento?.cliente.cpf || '');
-  const [showConfettiSuccess, setShowConfettiSuccess] = useState(false);
 
   if (!orcamento) {
     return (
-      <div className="glass-panel" style={{ textAlign: 'center', padding: '3rem 1rem' }}>
-        <AlertCircle size={40} color="var(--warning)" style={{ margin: '0 auto 1rem auto' }} />
-        <h3 style={{ color: '#ffffff', marginBottom: '0.5rem' }}>Orçamento não encontrado</h3>
-        <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>O link pode estar expirado ou o código do orçamento foi digitado incorretamente.</p>
+      <div className="glass-panel" style={{ textAlign: 'center', padding: '3rem 1.5rem' }}>
+        <AlertCircle size={36} color="#d97706" style={{ margin: '0 auto 0.75rem auto' }} />
+        <h3 style={{ color: '#0f172a', marginBottom: '0.35rem' }}>Orçamento não encontrado</h3>
+        <p style={{ color: 'var(--text-muted)', marginBottom: '1.25rem' }}>O link pode estar expirado ou o código do orçamento foi digitado incorretamente.</p>
         <button type="button" onClick={() => onNavigate('dashboard')} className="btn btn-primary">
-          Voltar ao Painel
+          Voltar ao Início
         </button>
       </div>
     );
@@ -53,7 +49,7 @@ export const VerAprovarOrcamento: React.FC<VerAprovarOrcamentoProps> = ({
 
   const handleSaveSignature = (dataUrl: string) => {
     if (!signerNome.trim()) {
-      alert('Por favor, confirme seu nome completo.');
+      alert('Por favor, informe seu nome completo.');
       return;
     }
 
@@ -71,16 +67,13 @@ export const VerAprovarOrcamento: React.FC<VerAprovarOrcamentoProps> = ({
       assinaturaClienteAprovacao: assinatura
     };
 
-    // Salva no storage local reativo (ADM recebe notificação em tempo real)
     storageService.saveOrcamento(updated);
     setIsSigningOpen(false);
-    setShowConfettiSuccess(true);
 
-    // Efeito comemorativo de confetes
     try {
       confetti({
-        particleCount: 120,
-        spread: 80,
+        particleCount: 100,
+        spread: 70,
         origin: { y: 0.6 }
       });
     } catch {
@@ -92,15 +85,15 @@ export const VerAprovarOrcamento: React.FC<VerAprovarOrcamentoProps> = ({
 
   return (
     <div style={{ maxWidth: '840px', margin: '0 auto' }}>
-      {/* Botão de Retorno */}
-      <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* Botões de Ação Topo */}
+      <div style={{ marginBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
         <button
           type="button"
           onClick={() => onNavigate('orcamentos')}
           className="btn btn-secondary btn-sm no-print"
         >
-          <ArrowLeft size={16} />
-          Voltar aos Orçamentos
+          <ArrowLeft size={15} />
+          Voltar
         </button>
 
         <div style={{ display: 'flex', gap: '0.5rem' }}>
@@ -109,7 +102,7 @@ export const VerAprovarOrcamento: React.FC<VerAprovarOrcamentoProps> = ({
             onClick={() => onNavigate('nota', orcamento.id)}
             className="btn btn-outline btn-sm no-print"
           >
-            <Receipt size={15} />
+            <Receipt size={14} />
             Nota Simples
           </button>
           <button
@@ -117,87 +110,79 @@ export const VerAprovarOrcamento: React.FC<VerAprovarOrcamentoProps> = ({
             onClick={() => window.print()}
             className="btn btn-secondary btn-sm no-print"
           >
-            <Printer size={15} />
-            Imprimir Proposta
+            <Printer size={14} />
+            Imprimir
           </button>
         </div>
       </div>
 
       {/* Cartão Oficial da Proposta */}
-      <div className="glass-panel" style={{ padding: '2rem 1.75rem', position: 'relative' }}>
-        {/* Cabeçalho Oficial Olividros */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.25rem', borderBottom: '1px solid var(--border-subtle)', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            <div className="logo-badge" style={{ width: 52, height: 52 }}>
-              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
-                <polyline points="2 17 12 22 22 17"></polyline>
-                <polyline points="2 12 12 17 22 12"></polyline>
-              </svg>
+      <div className="glass-panel" style={{ padding: '2rem', borderTop: '4px solid #16a34a' }}>
+        {/* Cabeçalho */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1.25rem', borderBottom: '1px solid #e2e8f0', paddingBottom: '1.25rem', marginBottom: '1.5rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <div style={{ width: 46, height: 46, borderRadius: '8px', background: '#16a34a', color: '#ffffff', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Building2 size={24} />
             </div>
             <div>
-              <h2 style={{ fontSize: '1.4rem', color: '#ffffff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              <h2 style={{ fontSize: '1.35rem', color: '#0f172a', fontWeight: 800 }}>
                 {DADOS_VIDRACARIA_PADRAO.nome}
               </h2>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+              <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
                 {DADOS_VIDRACARIA_PADRAO.endereco} • {DADOS_VIDRACARIA_PADRAO.bairro} - {DADOS_VIDRACARIA_PADRAO.cidade}/{DADOS_VIDRACARIA_PADRAO.uf}
               </p>
-              <p style={{ fontSize: '0.8rem', color: 'var(--primary)', fontWeight: 600 }}>
+              <p style={{ fontSize: '0.82rem', color: '#16a34a', fontWeight: 600 }}>
                 WhatsApp: {DADOS_VIDRACARIA_PADRAO.whatsapp} • {DADOS_VIDRACARIA_PADRAO.instagram}
               </p>
             </div>
           </div>
 
           <div style={{ textAlign: 'right' }}>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Proposta Comercial Nº</div>
-            <div style={{ fontSize: '1.3rem', fontWeight: 800, color: 'var(--primary)' }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Proposta Nº</div>
+            <div style={{ fontSize: '1.35rem', fontWeight: 800, color: '#16a34a' }}>
               {orcamento.numeroProtocolo}
             </div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginTop: '0.25rem' }}>
-              Emitido em: {new Date(orcamento.dataCriacao).toLocaleDateString('pt-BR')}
-            </div>
-            <div style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-              Válido até: {new Date(orcamento.dataValidade).toLocaleDateString('pt-BR')}
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              Data: {new Date(orcamento.dataCriacao).toLocaleDateString('pt-BR')}
             </div>
           </div>
         </div>
 
         {/* Dados do Cliente */}
-        <div style={{ background: 'rgba(8, 18, 27, 0.6)', borderRadius: 'var(--radius-md)', padding: '1rem', border: '1px solid var(--border-subtle)', marginBottom: '1.5rem' }}>
-          <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.4rem' }}>
-            Dados do Cliente & Local de Instalação:
+        <div style={{ background: '#f8fafc', borderRadius: 'var(--radius-md)', padding: '0.85rem 1rem', border: '1px solid #e2e8f0', marginBottom: '1.25rem' }}>
+          <div style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.35rem' }}>
+            Cliente & Local de Instalação:
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.5rem', fontSize: '0.88rem' }}>
             <div>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Cliente: </span>
-              <strong style={{ color: '#ffffff', fontSize: '0.95rem' }}>{orcamento.cliente.nome}</strong>
+              <span style={{ color: 'var(--text-muted)' }}>Cliente: </span>
+              <strong style={{ color: '#0f172a' }}>{orcamento.cliente.nome}</strong>
             </div>
             <div>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>WhatsApp: </span>
-              <span style={{ color: '#ffffff', fontSize: '0.9rem' }}>{orcamento.cliente.whatsapp}</span>
+              <span style={{ color: 'var(--text-muted)' }}>WhatsApp: </span>
+              <span style={{ color: '#0f172a' }}>{orcamento.cliente.whatsapp}</span>
             </div>
             <div style={{ gridColumn: 'span 2' }}>
-              <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Endereço: </span>
-              <span style={{ color: '#ffffff', fontSize: '0.9rem' }}>
+              <span style={{ color: 'var(--text-muted)' }}>Endereço: </span>
+              <span style={{ color: '#0f172a' }}>
                 {orcamento.cliente.endereco}, {orcamento.cliente.bairro} - {orcamento.cliente.cidade}
-                {orcamento.cliente.complemento && ` (${orcamento.cliente.complemento})`}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Tabela de Itens e Especificações do Vidro */}
+        {/* Itens */}
         <div style={{ marginBottom: '1.5rem' }}>
-          <h4 style={{ fontSize: '0.95rem', color: 'var(--primary)', textTransform: 'uppercase', marginBottom: '0.75rem', letterSpacing: '0.04em' }}>
-            Itens do Pedido & Especificações Técnicas
+          <h4 style={{ fontSize: '0.92rem', color: '#0f172a', textTransform: 'uppercase', marginBottom: '0.65rem' }}>
+            Especificações dos Vidros e Materiais
           </h4>
 
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.88rem' }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-dim)', fontSize: '0.78rem', textTransform: 'uppercase' }}>
-                  <th style={{ padding: '0.65rem', textAlign: 'left' }}>Item / Descrição</th>
-                  <th style={{ padding: '0.65rem', textAlign: 'center' }}>Medidas</th>
+                <tr style={{ borderBottom: '1px solid #e2e8f0', background: '#f1f5f9', color: '#475569', fontSize: '0.75rem', textTransform: 'uppercase' }}>
+                  <th style={{ padding: '0.65rem', textAlign: 'left' }}>Item</th>
+                  <th style={{ padding: '0.65rem', textAlign: 'center' }}>Medidas (m²)</th>
                   <th style={{ padding: '0.65rem', textAlign: 'center' }}>Vidro / Perfil</th>
                   <th style={{ padding: '0.65rem', textAlign: 'center' }}>Qtd</th>
                   <th style={{ padding: '0.65rem', textAlign: 'right' }}>Total</th>
@@ -205,25 +190,21 @@ export const VerAprovarOrcamento: React.FC<VerAprovarOrcamentoProps> = ({
               </thead>
               <tbody>
                 {orcamento.itens.map((item, idx) => (
-                  <tr key={idx} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                    <td style={{ padding: '0.85rem 0.65rem' }}>
-                      <strong style={{ color: '#ffffff', display: 'block' }}>{item.descricao}</strong>
-                      <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Vidraçaria sob medida</span>
+                  <tr key={idx} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                    <td style={{ padding: '0.75rem 0.65rem' }}>
+                      <strong style={{ color: '#0f172a' }}>{item.descricao}</strong>
                     </td>
-                    <td style={{ padding: '0.85rem 0.65rem', textAlign: 'center', color: 'var(--text-muted)' }}>
-                      {item.larguraCm > 0 ? `${item.larguraCm} x ${item.alturaCm} cm` : 'Padrão'}
-                      <div style={{ fontSize: '0.75rem', color: 'var(--primary)' }}>({item.m2.toFixed(2)} m²)</div>
+                    <td style={{ padding: '0.75rem 0.65rem', textAlign: 'center', color: '#475569' }}>
+                      {item.larguraCm > 0 ? `${item.larguraCm} x ${item.alturaCm} cm` : 'Sob medida'}
+                      <div style={{ fontSize: '0.75rem', color: '#16a34a', fontWeight: 600 }}>({item.m2.toFixed(2)} m²)</div>
                     </td>
-                    <td style={{ padding: '0.85rem 0.65rem', textAlign: 'center' }}>
-                      <span style={{ color: '#ffffff', textTransform: 'capitalize' }}>{item.corVidro}</span>
-                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', textTransform: 'capitalize' }}>
-                        Alum. {item.corPerfil}
-                      </div>
+                    <td style={{ padding: '0.75rem 0.65rem', textAlign: 'center', textTransform: 'capitalize' }}>
+                      Vidro {item.corVidro} • Perfil {item.corPerfil}
                     </td>
-                    <td style={{ padding: '0.85rem 0.65rem', textAlign: 'center', color: '#ffffff', fontWeight: 600 }}>
+                    <td style={{ padding: '0.75rem 0.65rem', textAlign: 'center', fontWeight: 600 }}>
                       {item.quantidade}
                     </td>
-                    <td style={{ padding: '0.85rem 0.65rem', textAlign: 'right', fontWeight: 700, color: '#ffffff' }}>
+                    <td style={{ padding: '0.75rem 0.65rem', textAlign: 'right', fontWeight: 700, color: '#0f172a' }}>
                       {formatBRL(item.valorTotal)}
                     </td>
                   </tr>
@@ -233,72 +214,66 @@ export const VerAprovarOrcamento: React.FC<VerAprovarOrcamentoProps> = ({
           </div>
         </div>
 
-        {/* Resumo Financeiro & Condições */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '1.25rem', background: 'rgba(8, 18, 27, 0.4)', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-subtle)', marginBottom: '1.75rem' }}>
+        {/* Resumo Financeiro */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '1.25rem', background: '#f8fafc', padding: '1.25rem', borderRadius: 'var(--radius-md)', border: '1px solid #e2e8f0', marginBottom: '1.5rem' }}>
           <div>
-            <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.4rem' }}>
+            <div style={{ fontSize: '0.78rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 700, marginBottom: '0.35rem' }}>
               Condições & Prazos
             </div>
-            <p style={{ fontSize: '0.85rem', color: '#ffffff', marginBottom: '0.4rem' }}>
+            <p style={{ fontSize: '0.85rem', color: '#0f172a', marginBottom: '0.35rem' }}>
               <strong>Forma de Pagamento:</strong> {orcamento.condicoesPagamento}
             </p>
-            <p style={{ fontSize: '0.85rem', color: '#ffffff', marginBottom: '0.4rem' }}>
-              <strong>Prazo de Instalação:</strong> {orcamento.prazoInstalacaoDias} dias úteis após aprovação
+            <p style={{ fontSize: '0.85rem', color: '#0f172a', marginBottom: '0.35rem' }}>
+              <strong>Prazo de Instalação:</strong> {orcamento.prazoInstalacaoDias} dias úteis
             </p>
-            <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-              Garantia de 1 ano para ferragens e vedação / 5 anos para vidros temperados contra defeitos de têmpera conforme norma ABNT.
+            <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
+              Garantia de 1 ano para ferragens e vedação / 5 anos para têmpera conforme normas ABNT.
             </p>
           </div>
 
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end', borderLeft: '1px solid var(--border-subtle)', paddingLeft: '1rem' }}>
-            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Subtotal dos Produtos: {formatBRL(orcamento.valorItens)}</div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'flex-end', borderLeft: '1px solid #e2e8f0', paddingLeft: '1rem' }}>
+            <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Produtos: {formatBRL(orcamento.valorItens)}</div>
             {orcamento.valorMaoDeObra > 0 && (
-              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Instalação Especializada: {formatBRL(orcamento.valorMaoDeObra)}</div>
+              <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Instalação: {formatBRL(orcamento.valorMaoDeObra)}</div>
             )}
             {orcamento.valorDesconto > 0 && (
-              <div style={{ fontSize: '0.85rem', color: '#10b981' }}>Desconto Aplicado: - {formatBRL(orcamento.valorDesconto)}</div>
+              <div style={{ fontSize: '0.85rem', color: '#16a34a' }}>Desconto: - {formatBRL(orcamento.valorDesconto)}</div>
             )}
-            <div style={{ marginTop: '0.5rem', textAlign: 'right' }}>
-              <span style={{ fontSize: '0.85rem', color: 'var(--text-dim)', textTransform: 'uppercase' }}>Investimento Total:</span>
-              <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--primary)' }}>
+            <div style={{ marginTop: '0.35rem', textAlign: 'right', borderTop: '2px solid #0f172a', paddingTop: '0.35rem' }}>
+              <span style={{ fontSize: '0.75rem', color: '#64748b', textTransform: 'uppercase', fontWeight: 700 }}>Valor Total:</span>
+              <div style={{ fontSize: '1.6rem', fontWeight: 800, color: '#16a34a' }}>
                 {formatBRL(orcamento.valorTotal)}
               </div>
             </div>
           </div>
         </div>
 
-        {/* SEÇÃO DE ASSINATURA DIGITAL */}
+        {/* ASSINATURA DIGITAL */}
         {isApproved && orcamento.assinaturaClienteAprovacao ? (
-          /* Já Assinado */
-          <div style={{ background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.3)', borderRadius: 'var(--radius-lg)', padding: '1.5rem', textAlign: 'center' }}>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', color: '#10b981', fontWeight: 700, fontSize: '1.1rem', marginBottom: '0.5rem' }}>
-              <CheckCircle2 size={24} />
+          <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 'var(--radius-md)', padding: '1.25rem', textAlign: 'center' }}>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', color: '#15803d', fontWeight: 700, fontSize: '1rem', marginBottom: '0.35rem' }}>
+              <CheckCircle2 size={20} color="#16a34a" />
               Proposta Aprovada com Assinatura Digital
             </div>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1rem' }}>
-              Assinado eletronicamente por <strong>{orcamento.assinaturaClienteAprovacao.autorNome}</strong> (CPF: {orcamento.assinaturaClienteAprovacao.autorCpf || 'Registrado'}) em {orcamento.assinaturaClienteAprovacao.dataHora}
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.82rem', marginBottom: '0.75rem' }}>
+              Assinado eletronicamente por <strong>{orcamento.assinaturaClienteAprovacao.autorNome}</strong> em {orcamento.assinaturaClienteAprovacao.dataHora}
             </p>
 
-            <div style={{ maxWidth: '340px', margin: '0 auto', background: '#071018', border: '1px solid rgba(0, 210, 180, 0.3)', borderRadius: 'var(--radius-md)', padding: '0.75rem', overflow: 'hidden' }}>
+            <div style={{ maxWidth: '320px', margin: '0 auto', background: '#ffffff', border: '1px solid #cbd5e1', borderRadius: 'var(--radius-sm)', padding: '0.5rem' }}>
               <img
                 src={orcamento.assinaturaClienteAprovacao.dataUrl}
-                alt="Assinatura Digital do Cliente"
-                style={{ width: '100%', height: 'auto', display: 'block', borderRadius: '4px' }}
+                alt="Assinatura Digital"
+                style={{ width: '100%', height: 'auto', display: 'block' }}
               />
             </div>
-
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '0.75rem' }}>
-              Autenticação criptográfica gerada no ato do aceite com registro de data/hora oficial.
-            </p>
           </div>
         ) : (
-          /* Pendente de Assinatura - Botão de Aceite */
-          <div style={{ background: 'linear-gradient(135deg, rgba(0, 210, 180, 0.12) 0%, rgba(14, 165, 233, 0.08) 100%)', border: '1px solid var(--border-glass)', borderRadius: 'var(--radius-lg)', padding: '1.75rem', textAlign: 'center' }}>
-            <h3 style={{ fontSize: '1.3rem', color: '#ffffff', marginBottom: '0.5rem' }}>
-              Pronto para aprovar seu projeto de vidros?
+          <div style={{ background: '#f8fafc', border: '1px solid #cbd5e1', borderRadius: 'var(--radius-md)', padding: '1.5rem', textAlign: 'center' }}>
+            <h3 style={{ fontSize: '1.2rem', color: '#0f172a', marginBottom: '0.35rem' }}>
+              Aprovar Proposta & Assinar Digitalmente
             </h3>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem', maxWidth: '540px', margin: '0 auto 1.5rem auto' }}>
-              Para darmos início imediato ao corte e preparação dos vidros, assine digitalmente abaixo direto na tela do seu celular ou computador.
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem', maxWidth: '480px', margin: '0 auto 1.25rem auto' }}>
+              Assine digitalmente na tela do seu celular ou computador para confirmarmos seu pedido e iniciarmos a produção.
             </p>
 
             {!isSigningOpen ? (
@@ -306,16 +281,15 @@ export const VerAprovarOrcamento: React.FC<VerAprovarOrcamentoProps> = ({
                 type="button"
                 onClick={() => setIsSigningOpen(true)}
                 className="btn btn-primary btn-lg"
-                style={{ fontSize: '1.1rem', padding: '0.9rem 2rem', boxShadow: '0 0 25px rgba(0, 210, 180, 0.4)' }}
               >
-                <ShieldCheck size={22} />
-                Aprovar & Assinar Digitalmente
+                <ShieldCheck size={20} />
+                Aprovar & Assinar Agora
               </button>
             ) : (
-              <div style={{ maxWidth: '520px', margin: '0 auto', textAlign: 'left' }}>
-                <div className="form-grid-2" style={{ marginBottom: '1rem' }}>
+              <div style={{ maxWidth: '480px', margin: '0 auto', textAlign: 'left' }}>
+                <div className="form-grid-2" style={{ marginBottom: '0.85rem' }}>
                   <div className="form-group">
-                    <label className="form-label">Nome Completo do Responsável *</label>
+                    <label className="form-label">Nome Completo *</label>
                     <input
                       type="text"
                       className="form-control"
@@ -325,7 +299,7 @@ export const VerAprovarOrcamento: React.FC<VerAprovarOrcamentoProps> = ({
                     />
                   </div>
                   <div className="form-group">
-                    <label className="form-label">CPF (para formalizar o contrato)</label>
+                    <label className="form-label">CPF (opcional)</label>
                     <input
                       type="text"
                       className="form-control"
@@ -337,8 +311,8 @@ export const VerAprovarOrcamento: React.FC<VerAprovarOrcamentoProps> = ({
                 </div>
 
                 <SignaturePad
-                  titulo="Assinatura de Aceite da Proposta"
-                  subtitulo="Use o dedo na tela ou o mouse para desenhar sua assinatura"
+                  titulo="Assinatura de Aceite"
+                  subtitulo="Desenhe sua assinatura com o dedo ou mouse"
                   autorNome={signerNome}
                   onSave={handleSaveSignature}
                   onCancel={() => setIsSigningOpen(false)}
@@ -348,10 +322,10 @@ export const VerAprovarOrcamento: React.FC<VerAprovarOrcamentoProps> = ({
           </div>
         )}
 
-        {/* Rodapé da Proposta */}
-        <div style={{ marginTop: '2rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-          <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>
-            Olividros Vidraçaria • Austin - Nova Iguaçu / RJ • Tel: (21) 96757-8040
+        {/* Rodapé */}
+        <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem' }}>
+          <div style={{ fontSize: '0.78rem', color: '#64748b' }}>
+            Olividros Vidraçaria • Austin - Nova Iguaçu / RJ
           </div>
           <a
             href={`https://wa.me/${DADOS_VIDRACARIA_PADRAO.whatsapp.replace(/\D/g, '')}?text=${encodeURIComponent(`Olá, estou com dúvidas sobre o orçamento ${orcamento.numeroProtocolo}`)}`}
@@ -359,8 +333,8 @@ export const VerAprovarOrcamento: React.FC<VerAprovarOrcamentoProps> = ({
             rel="noreferrer"
             className="btn btn-whatsapp btn-sm no-print"
           >
-            <MessageSquare size={16} />
-            Falar com a Vidraçaria no WhatsApp
+            <MessageSquare size={15} />
+            Falar no WhatsApp
           </a>
         </div>
       </div>

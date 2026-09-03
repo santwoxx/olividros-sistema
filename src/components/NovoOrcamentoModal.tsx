@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Plus, Calculator, Check, ShieldCheck } from 'lucide-react';
+import { X, Plus, Calculator } from 'lucide-react';
 import { Orcamento, ItemOrcamento, TipoServico, TipoVidro, CorVidro, CorPerfil } from '../types';
 import { storageService } from '../services/storage';
 
@@ -19,12 +19,12 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
   // Dados do Cliente
   const [nome, setNome] = useState('');
   const [whatsapp, setWhatsapp] = useState('');
-  const [telefone, setTelefone] = useState('');
-  const [cpf, setCpf] = useState('');
+  const [telefone] = useState('');
+  const [cpf] = useState('');
   const [endereco, setEndereco] = useState('');
   const [bairro, setBairro] = useState('Austin');
   const [cidade, setCidade] = useState('Nova Iguaçu');
-  const [complemento, setComplemento] = useState('');
+  const [complemento] = useState('');
 
   // Item do Orçamento
   const [tipoServico, setTipoServico] = useState<TipoServico>('box');
@@ -34,23 +34,21 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
   const [tipoVidro, setTipoVidro] = useState<TipoVidro>('temperado_8mm');
   const [corVidro, setCorVidro] = useState<CorVidro>('incolor');
   const [corPerfil, setCorPerfil] = useState<CorPerfil>('preto');
-  const [quantidade, setQuantidade] = useState(1);
+  const [quantidade] = useState(1);
   const [valorUnitario, setValorUnitario] = useState(1150);
 
   // Valores Extras
   const [valorMaoDeObra, setValorMaoDeObra] = useState(150);
-  const [valorFrete, setValorFrete] = useState(0);
+  const [valorFrete] = useState(0);
   const [valorDesconto, setValorDesconto] = useState(0);
-  const [condicoesPagamento, setCondicoesPagamento] = useState('50% sinal via Pix + saldo na entrega/instalação (ou cartão em até 6x)');
+  const [condicoesPagamento, setCondicoesPagamento] = useState('50% sinal via Pix + saldo na conclusão (ou cartão até 6x)');
   const [prazoDias, setPrazoDias] = useState(5);
-  const [observacoes, setObservacoes] = useState('');
+  const [observacoes] = useState('');
 
-  // Cálculo de m²
   const m2 = Number(((larguraCm * alturaCm) / 10000).toFixed(2));
   const valorTotalItens = valorUnitario * quantidade;
   const valorTotalGeral = Math.max(0, valorTotalItens + valorMaoDeObra + valorFrete - valorDesconto);
 
-  // Auto-ajuste de descrição conforme tipo de serviço
   const handleServiceChange = (st: TipoServico) => {
     setTipoServico(st);
     switch (st) {
@@ -79,19 +77,19 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
         setValorUnitario(850);
         break;
       case 'guarda_corpo':
-        setDescricao('Guarda-Corpo Vidro Laminado/Temperado com Torres Inox 304');
+        setDescricao('Guarda-Corpo Vidro Laminado/Temperado');
         setLarguraCm(300);
         setAlturaCm(110);
         setValorUnitario(2800);
         break;
       case 'tampo_mesa':
-        setDescricao('Tampo de Mesa Redondo/Quadrado Vidro Lapidado 10mm');
+        setDescricao('Tampo de Mesa Vidro Lapidado 10mm');
         setLarguraCm(120);
         setAlturaCm(120);
         setValorUnitario(650);
         break;
       case 'manutencao':
-        setDescricao('Manutenção Preventiva / Troca de Roldanas e Vedação de Porta/Janela');
+        setDescricao('Manutenção Preventiva / Troca de Roldanas e Vedação');
         setLarguraCm(0);
         setAlturaCm(0);
         setValorUnitario(350);
@@ -112,7 +110,6 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
     const protocoloNum = Math.floor(100 + Math.random() * 900);
     const novoId = `orc-${Date.now()}`;
 
-    // Sanitiza WhatsApp (deixa apenas números e adiciona 55 se necessário)
     let cleanWa = whatsapp.replace(/\D/g, '');
     if (cleanWa.length === 11 || cleanWa.length === 10) {
       cleanWa = '55' + cleanWa;
@@ -167,29 +164,29 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
 
   return (
     <div className="modal-overlay">
-      <div className="modal-content" style={{ maxWidth: '720px' }}>
+      <div className="modal-content" style={{ maxWidth: '680px' }}>
         <div className="modal-header">
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.65rem' }}>
-            <Calculator className="icon-teal" size={22} color="#00d2b4" />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Calculator size={20} color="#16a34a" />
             <div>
-              <h3 style={{ color: '#ffffff', fontSize: '1.2rem' }}>Criar Novo Orçamento</h3>
+              <h3 style={{ color: '#0f172a', fontSize: '1.15rem' }}>Criar Novo Orçamento</h3>
               <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)' }}>
-                Vidraçaria Olividros • Calculadora de Metragem e Proposta
+                Olividros Vidraçaria • Calculadora de Metragem e Proposta
               </p>
             </div>
           </div>
-          <button type="button" onClick={onClose} className="btn-icon-close" style={{ background: 'transparent', border: 'none', color: 'var(--text-muted)', cursor: 'pointer' }}>
-            <X size={22} />
+          <button type="button" onClick={onClose} style={{ background: 'transparent', border: 'none', color: '#64748b', cursor: 'pointer' }}>
+            <X size={20} />
           </button>
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div className="modal-body" style={{ maxHeight: '72vh', overflowY: 'auto' }}>
-            {/* Seção 1: Dados do Cliente */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <h4 style={{ fontSize: '0.95rem', color: 'var(--primary)', textTransform: 'uppercase', marginBottom: '0.85rem', letterSpacing: '0.05em' }}>
+          <div className="modal-body" style={{ maxHeight: '70vh', overflowY: 'auto' }}>
+            {/* Dados do Cliente */}
+            <div style={{ marginBottom: '1.25rem' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#16a34a', textTransform: 'uppercase', marginBottom: '0.65rem' }}>
                 1. Dados do Cliente
-              </h4>
+              </div>
 
               <div className="form-grid-2">
                 <div className="form-group">
@@ -198,7 +195,7 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
                     type="text"
                     required
                     className="form-control"
-                    placeholder="Ex: Carlos Eduardo"
+                    placeholder="Ex: João da Silva"
                     value={nome}
                     onChange={e => setNome(e.target.value)}
                   />
@@ -222,7 +219,7 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
                   <input
                     type="text"
                     className="form-control"
-                    placeholder="Rua, Número, Apto"
+                    placeholder="Rua, Número"
                     value={endereco}
                     onChange={e => setEndereco(e.target.value)}
                   />
@@ -250,11 +247,11 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
               </div>
             </div>
 
-            {/* Seção 2: Especificação do Vidro e Serviço */}
-            <div style={{ marginBottom: '1.5rem' }}>
-              <h4 style={{ fontSize: '0.95rem', color: 'var(--primary)', textTransform: 'uppercase', marginBottom: '0.85rem', letterSpacing: '0.05em' }}>
+            {/* Vidro e Medidas */}
+            <div style={{ marginBottom: '1.25rem' }}>
+              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#16a34a', textTransform: 'uppercase', marginBottom: '0.65rem' }}>
                 2. Especificações do Vidro & Medidas
-              </h4>
+              </div>
 
               <div className="form-grid-2">
                 <div className="form-group">
@@ -271,7 +268,7 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
                     <option value="guarda_corpo">Guarda-Corpo</option>
                     <option value="cortina_vidro">Cortina de Vidro (Fechamento)</option>
                     <option value="tampo_mesa">Tampo de Mesa</option>
-                    <option value="manutencao">Manutenção Preventiva / Reparo</option>
+                    <option value="manutencao">Manutenção / Reparo</option>
                   </select>
                 </div>
 
@@ -286,7 +283,6 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
                 </div>
               </div>
 
-              {/* Medidas e m² */}
               <div className="form-grid-3">
                 <div className="form-group">
                   <label className="form-label">Largura (cm)</label>
@@ -309,17 +305,16 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
                   />
                 </div>
                 <div className="form-group">
-                  <label className="form-label">Área Calculada (m²)</label>
-                  <div style={{ background: 'rgba(0, 210, 180, 0.1)', border: '1px solid var(--border-glass)', borderRadius: 'var(--radius-md)', padding: '0.7rem 1rem', color: 'var(--primary)', fontWeight: 700, fontSize: '1.1rem', textAlign: 'center' }}>
+                  <label className="form-label">Área Calculada</label>
+                  <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 'var(--radius-md)', padding: '0.65rem', color: '#16a34a', fontWeight: 800, fontSize: '1rem', textAlign: 'center' }}>
                     {m2.toFixed(2)} m²
                   </div>
                 </div>
               </div>
 
-              {/* Acabamentos */}
               <div className="form-grid-3">
                 <div className="form-group">
-                  <label className="form-label">Espessura / Tipo</label>
+                  <label className="form-label">Tipo de Vidro</label>
                   <select
                     className="form-select"
                     value={tipoVidro}
@@ -351,7 +346,7 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Cor do Alumínio/Perfil</label>
+                  <label className="form-label">Cor do Alumínio</label>
                   <select
                     className="form-select"
                     value={corPerfil}
@@ -368,15 +363,15 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
               </div>
             </div>
 
-            {/* Seção 3: Valores Financeiros */}
+            {/* Valores */}
             <div>
-              <h4 style={{ fontSize: '0.95rem', color: 'var(--primary)', textTransform: 'uppercase', marginBottom: '0.85rem', letterSpacing: '0.05em' }}>
-                3. Composição de Preço & Pagamento
-              </h4>
+              <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#16a34a', textTransform: 'uppercase', marginBottom: '0.65rem' }}>
+                3. Valores & Condições
+              </div>
 
               <div className="form-grid-3">
                 <div className="form-group">
-                  <label className="form-label">Valor do Vidro/Kit (R$)</label>
+                  <label className="form-label">Valor do Produto (R$)</label>
                   <input
                     type="number"
                     min="0"
@@ -429,10 +424,10 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
                 </div>
               </div>
 
-              {/* Totalizador em Destaque */}
-              <div style={{ background: 'linear-gradient(135deg, rgba(0, 210, 180, 0.15) 0%, rgba(14, 165, 233, 0.1) 100%)', border: '1px solid var(--border-glass)', borderRadius: 'var(--radius-md)', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '1rem', fontWeight: 600, color: '#ffffff' }}>Total Final do Orçamento:</span>
-                <span style={{ fontSize: '1.7rem', fontWeight: 800, color: 'var(--primary)' }}>
+              {/* Totalizador */}
+              <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: 'var(--radius-md)', padding: '0.85rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.92rem', fontWeight: 600, color: '#0f172a' }}>Total do Orçamento:</span>
+                <span style={{ fontSize: '1.5rem', fontWeight: 800, color: '#16a34a' }}>
                   {valorTotalGeral.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                 </span>
               </div>
@@ -444,7 +439,7 @@ export const NovoOrcamentoModal: React.FC<NovoOrcamentoModalProps> = ({
               Cancelar
             </button>
             <button type="submit" className="btn btn-primary">
-              <Plus size={16} />
+              <Plus size={15} />
               Gerar Orçamento & Link
             </button>
           </div>

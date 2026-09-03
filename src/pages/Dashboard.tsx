@@ -2,16 +2,16 @@ import React from 'react';
 import { 
   TrendingUp, 
   Clock, 
-  CheckCircle, 
   Truck, 
   Share2, 
   PlusCircle, 
   MessageSquare, 
   ArrowUpRight, 
   ExternalLink,
-  ShieldAlert,
   FileCheck,
-  Receipt
+  Receipt,
+  Building2,
+  FileSpreadsheet
 } from 'lucide-react';
 import { Orcamento, TransacaoFinanceira } from '../types';
 
@@ -28,10 +28,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
   onNavigate,
   onOpenNovoOrcamento
 }) => {
-  // Cálculos de Indicadores
   const solicitados = orcamentos.filter(o => o.status === 'solicitado');
   const aprovados = orcamentos.filter(o => o.status === 'aprovado' || o.status === 'em_producao');
-  const concluidos = orcamentos.filter(o => o.status === 'concluido');
   const entregasHoje = orcamentos.filter(o => o.entrega && o.entrega.statusEntrega !== 'instalado');
 
   const totalReceitas = transacoes
@@ -51,13 +49,13 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const getStatusBadge = (status: Orcamento['status']) => {
     switch (status) {
       case 'solicitado':
-        return <span className="status-pill status-solicitado">Novo Solicitado</span>;
+        return <span className="status-pill status-solicitado">Solicitado</span>;
       case 'em_analise':
         return <span className="status-pill status-em_analise">Em Análise</span>;
       case 'enviado_cliente':
-        return <span className="status-pill status-enviado_cliente">Enviado WhatsApp</span>;
+        return <span className="status-pill status-enviado_cliente">Enviado</span>;
       case 'aprovado':
-        return <span className="status-pill status-aprovado">Aprovado / Assinado</span>;
+        return <span className="status-pill status-aprovado">Aprovado</span>;
       case 'em_producao':
         return <span className="status-pill status-em_producao">Em Produção</span>;
       case 'aguardando_entrega':
@@ -72,28 +70,28 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const copyClienteLink = () => {
     const url = `${window.location.origin}${window.location.pathname}?tab=solicitar`;
     navigator.clipboard.writeText(url);
-    alert('Link de solicitação copiado! Envie para o seu cliente pelo WhatsApp:\n' + url);
+    alert('Link copiado com sucesso! Envie para o seu cliente pelo WhatsApp:\n' + url);
   };
 
   return (
     <div className="dashboard-view">
-      {/* Banner de Boas-Vindas & Ações Rápidas */}
-      <div className="glass-panel glass-panel-glow" style={{ marginBottom: '2rem' }}>
+      {/* Banner Superior Limpo */}
+      <div className="glass-panel" style={{ marginBottom: '1.5rem', background: '#ffffff', borderColor: '#e2e8f0' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(0, 210, 180, 0.12)', padding: '0.25rem 0.75rem', borderRadius: '999px', marginBottom: '0.5rem' }}>
-              <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#00d2b4', display: 'inline-block', boxShadow: '0 0 8px #00d2b4' }}></span>
-              <span style={{ fontSize: '0.75rem', color: '#00d2b4', fontWeight: 700, textTransform: 'uppercase' }}>Sistema Online • Olividros Austin / RJ</span>
+            <div style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', background: '#f0fdf4', color: '#16a34a', border: '1px solid #bbf7d0', padding: '0.2rem 0.65rem', borderRadius: '999px', fontSize: '0.75rem', fontWeight: 700, marginBottom: '0.4rem', textTransform: 'uppercase' }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#16a34a', display: 'inline-block' }}></span>
+              Sistema de Gestão • Olividros Vidraçaria
             </div>
-            <h2 style={{ fontSize: '1.8rem', color: '#ffffff', marginBottom: '0.25rem' }}>
-              Painel de Controle Vidraçaria
+            <h2 style={{ fontSize: '1.5rem', color: '#0f172a', marginBottom: '0.2rem' }}>
+              Painel Administrativo
             </h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.95rem' }}>
-              Gerencie orçamentos, assinaturas digitais, rotas de instaladores e fluxo financeiro em tempo real.
+            <p style={{ color: 'var(--text-muted)', fontSize: '0.88rem' }}>
+              Acompanhe pedidos, orçamentos, assinaturas digitais e fluxo de caixa da vidraçaria.
             </p>
           </div>
 
-          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
             <button 
               type="button" 
               onClick={copyClienteLink}
@@ -118,179 +116,199 @@ export const Dashboard: React.FC<DashboardProps> = ({
       <div className="kpi-grid">
         <div className="kpi-card" onClick={() => onNavigate('financeiro')} style={{ cursor: 'pointer' }}>
           <div>
-            <div className="kpi-label">Saldo em Caixa Líquido</div>
-            <div className="kpi-val" style={{ color: saldoLiquido >= 0 ? '#10b981' : '#ef4444' }}>
+            <div className="kpi-label">Saldo em Caixa</div>
+            <div className="kpi-val" style={{ color: saldoLiquido >= 0 ? '#16a34a' : '#dc2626' }}>
               {formatBRL(saldoLiquido)}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
               Entradas: {formatBRL(totalReceitas)} | Saídas: {formatBRL(totalDespesas)}
             </span>
           </div>
-          <div className="kpi-icon-box" style={{ background: 'rgba(16, 185, 129, 0.15)', color: '#10b981' }}>
-            <TrendingUp size={24} />
+          <div className="kpi-icon-box" style={{ background: '#f0fdf4', color: '#16a34a' }}>
+            <TrendingUp size={22} />
           </div>
         </div>
 
         <div className="kpi-card" onClick={() => onNavigate('orcamentos')} style={{ cursor: 'pointer' }}>
           <div>
             <div className="kpi-label">Novas Solicitações</div>
-            <div className="kpi-val" style={{ color: '#f59e0b' }}>
+            <div className="kpi-val" style={{ color: '#d97706' }}>
               {solicitados.length}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
-              Clientes aguardando orçamento no WhatsApp
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              Aguardando envio de proposta
             </span>
           </div>
-          <div className="kpi-icon-box" style={{ background: 'rgba(245, 158, 11, 0.15)', color: '#f59e0b' }}>
-            <Clock size={24} />
+          <div className="kpi-icon-box" style={{ background: '#fef3c7', color: '#d97706' }}>
+            <Clock size={22} />
           </div>
         </div>
 
         <div className="kpi-card" onClick={() => onNavigate('orcamentos')} style={{ cursor: 'pointer' }}>
           <div>
-            <div className="kpi-label">Em Produção / Aprovados</div>
-            <div className="kpi-val" style={{ color: '#00d2b4' }}>
+            <div className="kpi-label">Aprovados / Em Produção</div>
+            <div className="kpi-val" style={{ color: '#16a34a' }}>
               {aprovados.length}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
-              Assinados e prontos para corte / montagem
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              Assinados pelo cliente
             </span>
           </div>
-          <div className="kpi-icon-box" style={{ background: 'rgba(0, 210, 180, 0.15)', color: '#00d2b4' }}>
-            <FileCheck size={24} />
+          <div className="kpi-icon-box" style={{ background: '#f0fdf4', color: '#16a34a' }}>
+            <FileCheck size={22} />
           </div>
         </div>
 
         <div className="kpi-card" onClick={() => onNavigate('funcionario')} style={{ cursor: 'pointer' }}>
           <div>
-            <div className="kpi-label">Instalações em Campo</div>
+            <div className="kpi-label">Instalações em Rota</div>
             <div className="kpi-val" style={{ color: '#0284c7' }}>
               {entregasHoje.length}
             </div>
-            <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
-              Aguardando assinatura de entrega
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              Pendentes de assinatura na entrega
             </span>
           </div>
-          <div className="kpi-icon-box" style={{ background: 'rgba(2, 132, 199, 0.15)', color: '#0284c7' }}>
-            <Truck size={24} />
+          <div className="kpi-icon-box" style={{ background: '#e0f2fe', color: '#0284c7' }}>
+            <Truck size={22} />
           </div>
         </div>
       </div>
 
-      {/* Seção Principal: Lista Recente de Orçamentos com Ações Imediatas */}
-      <div className="glass-panel" style={{ marginBottom: '2rem' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.5rem' }}>
+      {/* Lista Recente de Orçamentos */}
+      <div className="glass-panel" style={{ marginBottom: '1.5rem' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem', flexWrap: 'wrap', gap: '0.5rem' }}>
           <div>
-            <h3 style={{ fontSize: '1.2rem', color: '#ffffff' }}>Atendimentos & Pedidos Recentes</h3>
-            <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-              Orçamentos solicitados, links enviados e ordens em andamento
+            <h3 style={{ fontSize: '1.1rem', color: '#0f172a' }}>Orçamentos e Pedidos Recentes</h3>
+            <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)' }}>
+              Histórico de solicitações, propostas e instalações
             </p>
           </div>
-          <button
-            type="button"
-            onClick={() => onNavigate('orcamentos')}
-            className="btn btn-outline btn-sm"
-          >
-            Ver Todos ({orcamentos.length})
-            <ArrowUpRight size={15} />
-          </button>
+          {orcamentos.length > 0 && (
+            <button
+              type="button"
+              onClick={() => onNavigate('orcamentos')}
+              className="btn btn-secondary btn-sm"
+            >
+              Ver Todos ({orcamentos.length})
+              <ArrowUpRight size={14} />
+            </button>
+          )}
         </div>
 
-        <div style={{ overflowX: 'auto' }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.9rem' }}>
-            <thead>
-              <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-dim)', fontSize: '0.8rem', textTransform: 'uppercase' }}>
-                <th style={{ padding: '0.75rem 0.5rem' }}>Protocolo</th>
-                <th style={{ padding: '0.75rem 0.5rem' }}>Cliente</th>
-                <th style={{ padding: '0.75rem 0.5rem' }}>Serviço / Itens</th>
-                <th style={{ padding: '0.75rem 0.5rem' }}>Valor Total</th>
-                <th style={{ padding: '0.75rem 0.5rem' }}>Status</th>
-                <th style={{ padding: '0.75rem 0.5rem', textAlign: 'right' }}>Ações Rápidas</th>
-              </tr>
-            </thead>
-            <tbody>
-              {orcamentos.slice(0, 6).map((orc) => (
-                <tr 
-                  key={orc.id} 
-                  style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.04)', transition: 'background 0.2s' }}
-                >
-                  <td style={{ padding: '1rem 0.5rem', fontWeight: 700, color: 'var(--primary)' }}>
-                    {orc.numeroProtocolo}
-                  </td>
-                  <td style={{ padding: '1rem 0.5rem' }}>
-                    <div style={{ fontWeight: 600, color: '#ffffff' }}>{orc.cliente.nome}</div>
-                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{orc.cliente.bairro} - {orc.cliente.cidade}</div>
-                  </td>
-                  <td style={{ padding: '1rem 0.5rem', color: 'var(--text-muted)' }}>
-                    {orc.itens.map(i => i.descricao).join(', ').substring(0, 45)}...
-                  </td>
-                  <td style={{ padding: '1rem 0.5rem', fontWeight: 700, color: '#ffffff' }}>
-                    {formatBRL(orc.valorTotal)}
-                  </td>
-                  <td style={{ padding: '1rem 0.5rem' }}>
-                    {getStatusBadge(orc.status)}
-                  </td>
-                  <td style={{ padding: '1rem 0.5rem', textAlign: 'right' }}>
-                    <div style={{ display: 'inline-flex', gap: '0.4rem', justifyContent: 'flex-end' }}>
-                      {/* Botão Ver / Assinar Proposta */}
-                      <button
-                        type="button"
-                        onClick={() => onNavigate('ver_proposta', orc.id)}
-                        className="btn btn-secondary btn-sm"
-                        title="Abrir página de aceite/assinatura do cliente"
-                      >
-                        <ExternalLink size={14} />
-                        Proposta
-                      </button>
-
-                      {/* Botão Gerar Nota Simples */}
-                      <button
-                        type="button"
-                        onClick={() => onNavigate('nota', orc.id)}
-                        className="btn btn-outline btn-sm"
-                        title="Ver Nota Simples / Recibo Comercial"
-                      >
-                        <Receipt size={14} />
-                        Nota
-                      </button>
-
-                      {/* Botão WhatsApp */}
-                      <a
-                        href={`https://wa.me/${orc.cliente.whatsapp}?text=${encodeURIComponent(
-                          `Olá ${orc.cliente.nome}, aqui é da Vidraçaria Olividros! Segue o link com seu orçamento detalhado: ${window.location.origin}${window.location.pathname}?tab=ver_proposta&id=${orc.id}`
-                        )}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="btn btn-whatsapp btn-sm"
-                        title="Enviar orçamento no WhatsApp"
-                      >
-                        <MessageSquare size={14} />
-                      </a>
-                    </div>
-                  </td>
+        {orcamentos.length === 0 ? (
+          <div className="empty-state">
+            <FileSpreadsheet size={36} color="#94a3b8" style={{ margin: '0 auto 0.75rem auto' }} />
+            <h3>Nenhum orçamento cadastrado ainda</h3>
+            <p>
+              Crie o primeiro orçamento da vidraçaria ou copie o link para que seus clientes façam solicitações online diretamente pelo WhatsApp.
+            </p>
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={onOpenNovoOrcamento}
+                className="btn btn-primary"
+              >
+                <PlusCircle size={16} />
+                Criar Primeiro Orçamento
+              </button>
+              <button
+                type="button"
+                onClick={copyClienteLink}
+                className="btn btn-secondary"
+              >
+                <Share2 size={16} />
+                Copiar Link p/ Clientes
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div style={{ overflowX: 'auto' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', fontSize: '0.88rem' }}>
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border-subtle)', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase' }}>
+                  <th style={{ padding: '0.65rem 0.5rem' }}>Protocolo</th>
+                  <th style={{ padding: '0.65rem 0.5rem' }}>Cliente</th>
+                  <th style={{ padding: '0.65rem 0.5rem' }}>Itens / Serviço</th>
+                  <th style={{ padding: '0.65rem 0.5rem' }}>Valor Total</th>
+                  <th style={{ padding: '0.65rem 0.5rem' }}>Status</th>
+                  <th style={{ padding: '0.65rem 0.5rem', textAlign: 'right' }}>Ações</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {orcamentos.slice(0, 6).map((orc) => (
+                  <tr 
+                    key={orc.id} 
+                    style={{ borderBottom: '1px solid #f1f5f9' }}
+                  >
+                    <td style={{ padding: '0.85rem 0.5rem', fontWeight: 700, color: '#16a34a' }}>
+                      {orc.numeroProtocolo}
+                    </td>
+                    <td style={{ padding: '0.85rem 0.5rem' }}>
+                      <div style={{ fontWeight: 600, color: '#0f172a' }}>{orc.cliente.nome}</div>
+                      <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{orc.cliente.bairro} - {orc.cliente.cidade}</div>
+                    </td>
+                    <td style={{ padding: '0.85rem 0.5rem', color: 'var(--text-muted)' }}>
+                      {orc.itens.map(i => i.descricao).join(', ').substring(0, 40)}...
+                    </td>
+                    <td style={{ padding: '0.85rem 0.5rem', fontWeight: 700, color: '#0f172a' }}>
+                      {formatBRL(orc.valorTotal)}
+                    </td>
+                    <td style={{ padding: '0.85rem 0.5rem' }}>
+                      {getStatusBadge(orc.status)}
+                    </td>
+                    <td style={{ padding: '0.85rem 0.5rem', textAlign: 'right' }}>
+                      <div style={{ display: 'inline-flex', gap: '0.35rem', justifyContent: 'flex-end' }}>
+                        <button
+                          type="button"
+                          onClick={() => onNavigate('ver_proposta', orc.id)}
+                          className="btn btn-secondary btn-sm"
+                          title="Ver proposta e assinatura do cliente"
+                        >
+                          <ExternalLink size={14} />
+                          Proposta
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => onNavigate('nota', orc.id)}
+                          className="btn btn-outline btn-sm"
+                          title="Ver Nota Simples"
+                        >
+                          <Receipt size={14} />
+                          Nota
+                        </button>
+                        <a
+                          href={`https://wa.me/${orc.cliente.whatsapp}?text=${encodeURIComponent(
+                            `Olá ${orc.cliente.nome}, aqui é da Vidraçaria Olividros! Segue seu orçamento detalhado: ${window.location.origin}${window.location.pathname}?tab=ver_proposta&id=${orc.id}`
+                          )}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="btn btn-whatsapp btn-sm"
+                          title="Enviar no WhatsApp"
+                        >
+                          <MessageSquare size={14} />
+                        </a>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
 
-      {/* Banner Informativo sobre a Vidraçaria Olividros */}
-      <div className="glass-panel" style={{ background: 'linear-gradient(135deg, rgba(13, 39, 56, 0.7) 0%, rgba(7, 14, 20, 0.9) 100%)', border: '1px solid rgba(0, 210, 180, 0.25)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
-          <div style={{ background: 'rgba(0, 210, 180, 0.15)', padding: '1rem', borderRadius: 'var(--radius-lg)', color: '#00d2b4' }}>
-            <ShieldAlert size={32} />
+      {/* Dados Institucionais do Rodapé */}
+      <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: 'var(--radius-md)', padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+        <div style={{ background: '#dcfce7', color: '#16a34a', padding: '0.65rem', borderRadius: 'var(--radius-sm)' }}>
+          <Building2 size={24} />
+        </div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: '0.9rem', fontWeight: 700, color: '#0f172a' }}>
+            Olividros Vidraçaria & Esquadrias • Austin / Nova Iguaçu - RJ
           </div>
-          <div style={{ flex: 1 }}>
-            <h4 style={{ color: '#ffffff', fontSize: '1.1rem', marginBottom: '0.2rem' }}>
-              Olividros Vidraçaria • Austin / Nova Iguaçu - RJ
-            </h4>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-              Rua XV de Novembro, 319 (Em frente à estação) • WhatsApp: <strong>(21) 96757-8040</strong> • Instagram: <strong>@olividros.vidracaria</strong>
-            </p>
-            <p style={{ color: 'var(--primary)', fontSize: '0.8rem', marginTop: '0.35rem', fontWeight: 600 }}>
-              Especialistas em Portas e Janelas de Vidro, Box Blindex, Guarda-Corpo, Espelhos Bisotados e Manutenção Preventiva/Corretiva.
-            </p>
+          <div style={{ fontSize: '0.8rem', color: '#475569' }}>
+            Rua XV de Novembro, 319 (Em frente à estação) • WhatsApp: (21) 96757-8040 • Instagram: @olividros.vidracaria
           </div>
         </div>
       </div>
